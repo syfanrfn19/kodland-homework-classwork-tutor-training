@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boost Student Attendance — Kodland Tutor Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blue:#1D4FD8;--blue-d:#123B9A;--blue-l:#5B8DF6;
+  --coral:#FF6B54;--coral-d:#E8503C;
+  --green:#7BC142;--green-d:#5A9C2C;--green-l:#A9DE7C;
+  --ink:#0B1F45;--ink2:#33456E;--muted:#7286AA;
+  --bg:#EEF4FF;--surface:#FFFFFF;--surface2:#F2F7FF;--border:#D7E6FC;
+  --text:var(--ink);--text2:var(--ink2);--text-muted:var(--muted);
+  --nav-bg:rgba(255,255,255,0.94);--nav-b:#D7E6FC;
+  --shadow:0 2px 14px rgba(11,31,69,.08);--shadow-h:0 10px 30px rgba(18,59,132,.16);
+  --hi-bg:#EEF5FF;--hi-b:#AECBF7;--hi-t:#123B9A;
+  --opt-h:#EEF5FF;
+  --ok-bg:#EAFBF1;--ok-b:#8FE3B4;--ok-t:#0F7A45;
+  --no-bg:#FFF1EF;--no-b:#FFC3B8;--no-t:#B23A26;
+  --r:16px;--rsm:10px;--rpill:999px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden}
+.screen{display:none;min-height:100vh;flex-direction:column}
+.screen.active{display:flex}
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:66px;background:var(--nav-bg);backdrop-filter:blur(14px);border-bottom:2px solid var(--nav-b);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:9px;text-decoration:none;flex-shrink:0}
+.logo-mark{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;letter-spacing:-.5px;color:var(--blue);line-height:1;white-space:nowrap}
+.logo-sub{font-family:'Inter',sans-serif;font-weight:700;font-size:12.5px;color:var(--coral);white-space:nowrap;line-height:1.3;max-width:150px}
+.logo-div{width:1px;height:26px;background:var(--border);margin:0 5px}
+.nav-r{display:flex;align-items:center;gap:8px;position:relative}
+.pbtn{display:flex;align-items:center;gap:5px;padding:9px 16px;border-radius:var(--rpill);background:var(--surface);border:2px solid var(--border);color:var(--text2);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;text-decoration:none}
+.pbtn:hover{background:var(--blue);border-color:var(--blue-d);color:#fff}
+/* LANG DROPDOWN */
+.lang-wrap{position:relative}
+.lang-btn{display:flex;align-items:center;gap:6px;padding:9px 14px;border-radius:var(--rpill);background:var(--surface);border:2px solid var(--border);color:var(--text2);font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer}
+.lang-btn:hover{border-color:var(--blue-l)}
+.lang-menu{display:none;position:absolute;top:48px;right:0;background:var(--surface);border:2px solid var(--border);border-radius:14px;box-shadow:var(--shadow-h);min-width:190px;overflow:hidden;z-index:50}
+.lang-menu.show{display:block}
+.lang-item{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;font-size:13.5px;font-weight:600;color:var(--text);cursor:pointer}
+.lang-item:hover{background:var(--surface2)}
+.lang-item.active{color:var(--blue);font-weight:800}
+.lang-item.disabled{color:var(--text-muted);cursor:not-allowed}
+.lang-item.disabled:hover{background:none}
+.lang-soon{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.4px;background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);padding:2px 7px;border-radius:var(--rpill)}
+/* HERO */
+.hero{padding:56px 40px 40px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;bottom:28%;background:radial-gradient(ellipse 70% 55% at 50% 0%,var(--blue-l) 0%,transparent 70%);opacity:.30;pointer-events:none}
+.hero-inner{position:relative;max-width:640px;margin:0 auto}
+.eyebrow{display:inline-flex;align-items:center;gap:6px;background:var(--surface);border:2px solid var(--border);border-radius:var(--rpill);padding:6px 16px;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:800;color:var(--blue);margin-bottom:22px;text-transform:uppercase;letter-spacing:.5px}
+.hero h1{font-family:'Baloo 2',sans-serif;font-size:clamp(32px,5.2vw,52px);font-weight:800;line-height:1.08;letter-spacing:-1px;color:var(--text);margin-bottom:16px}
+.h-pill{display:inline-block;background:var(--coral);color:#fff;border-radius:var(--rpill);padding:2px 20px;margin:0 2px;font-size:.92em}
+.hero p{color:var(--text2);font-size:16px;line-height:1.65;margin-bottom:22px;max-width:520px;margin-left:auto;margin-right:auto}
+.hero-reasons{max-width:540px;margin:0 auto 24px;text-align:left;display:flex;flex-direction:column;gap:10px}
+.hr-item{display:flex;gap:11px;align-items:flex-start;background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:13px 17px;font-size:14.5px;color:var(--text2);line-height:1.55;box-shadow:var(--shadow)}
+.hr-item span{flex-shrink:0;font-size:18px;line-height:1.4}
+.start-btn{display:inline-block;padding:16px 38px;background:var(--blue);color:#fff;border:none;border-radius:var(--rpill);font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:700;cursor:pointer;transition:all .15s;box-shadow:0 6px 20px rgba(29,79,216,.3);margin-top:4px}
+.start-btn:hover{background:var(--coral);transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,107,84,.35)}
+.prog-strip{display:inline-flex;align-items:center;gap:14px;background:var(--surface);border:2px solid var(--border);border-radius:var(--rpill);padding:12px 22px;box-shadow:var(--shadow);max-width:380px;width:100%}
+.pnum{font-family:'Baloo 2',sans-serif;font-weight:800;font-size:24px;color:var(--blue);line-height:1;flex-shrink:0}
+.ptrack{flex:1;height:9px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rpill);overflow:hidden}
+.pfill{height:100%;background:linear-gradient(90deg,var(--blue),var(--coral));border-radius:var(--rpill);transition:width .6s cubic-bezier(.34,1.56,.64,1)}
+.plbl{font-size:12.5px;color:var(--text-muted);font-weight:700;flex-shrink:0}
+/* ROUTE / ROADMAP */
+.msec{padding:8px 32px 70px;max-width:1080px;margin:0 auto;width:100%}
+.slbl{font-family:'Baloo 2',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:16px;margin-top:4px}
+.route{position:relative;max-width:760px;margin:0 auto;padding:6px 0}
+.route::before{content:'';position:absolute;left:29px;top:4px;bottom:4px;width:5px;background:repeating-linear-gradient(180deg,var(--green) 0 16px, transparent 16px 30px);border-radius:6px;z-index:0}
+.rstep{position:relative;display:flex;align-items:flex-start;gap:22px;margin-bottom:24px}
+.rnode{width:58px;height:58px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Baloo 2',sans-serif;font-weight:800;font-size:22px;flex-shrink:0;box-shadow:0 4px 14px rgba(0,0,0,.18);border:5px solid var(--bg);z-index:2}
+.rnode.locked{background:#C3CFE3;color:#7286AA}
+.rnode.coral{background:var(--coral)}
+.rnode.reading{background:var(--blue)}
+.rcard{flex:1;min-width:0}
+.rstep:nth-child(even) .rcard{margin-left:30px}
+@media(max-width:600px){.rstep:nth-child(even) .rcard{margin-left:0}.route::before{left:23px}.rnode{width:46px;height:46px;font-size:17px}.rstep{gap:14px}}
+.mc{background:var(--surface);border:2px solid var(--border);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;box-shadow:var(--shadow)}
+.mc:hover:not(.locked){transform:translateY(-4px);box-shadow:var(--shadow-h)}
+.mc.locked{opacity:.5;cursor:not-allowed}
+.mc.done{border-color:var(--green)}
+.mc-stripe{height:7px}
+.mc-body{padding:22px}
+.mc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+.mc-num{font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--text-muted)}
+.mc-em{font-size:32px}
+.mc-title{font-family:'Baloo 2',sans-serif;font-size:23px;font-weight:700;letter-spacing:-.2px;color:var(--text);margin-bottom:7px;line-height:1.15}
+.mc-desc{font-size:14.5px;color:var(--text2);line-height:1.6}
+.mc-foot{margin-top:16px;display:flex;align-items:center;justify-content:space-between}
+.badge{font-family:'Inter',sans-serif;font-size:11px;font-weight:800;letter-spacing:.3px;padding:5px 13px;border-radius:var(--rpill);text-transform:uppercase}
+.bd{background:#E4F5D3;color:var(--green-d);border:1.5px solid var(--green)}
+.bs{background:var(--coral);color:#fff;border:1.5px solid var(--coral-d)}
+.bl{background:var(--surface2);color:var(--text-muted);border:1.5px solid var(--border)}
+.br{background:#DCEBFF;color:var(--blue-d);border:1.5px solid var(--blue-l)}
+.stag{font-size:12.5px;color:var(--text-muted);font-weight:600}
+.stag b{color:var(--text)}
+/* CONTENT */
+.cbody{padding:38px 40px 60px;max-width:820px;margin:0 auto;width:100%;flex:1}
+.meyebrow{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:9px}
+.mh1{font-family:'Baloo 2',sans-serif;font-size:clamp(26px,4vw,38px);font-weight:800;letter-spacing:-.6px;line-height:1.12;color:var(--text);margin-bottom:16px}
+.mobj{background:var(--surface);border:2px solid var(--border);border-left:5px solid var(--blue);border-radius:0 var(--rsm) var(--rsm) 0;padding:14px 18px;font-size:14.5px;color:var(--text2);line-height:1.6;margin-bottom:34px}
+.mobj strong{color:var(--text)}
+.sch{font-family:'Baloo 2',sans-serif;font-size:25px;font-weight:800;margin:44px 0 18px;color:var(--text);display:flex;align-items:center;gap:10px;letter-spacing:-.3px}
+.sch::after{content:'';flex:1;height:3px;background:var(--border);border-radius:2px}
+.card{background:var(--surface);border:2px solid var(--border);border-radius:var(--r);padding:19px 21px;margin-bottom:11px;box-shadow:var(--shadow)}
+.card h4{font-family:'Baloo 2',sans-serif;font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px}
+.card p,.card li{font-size:14.5px;color:var(--text2);line-height:1.7}
+.card ul,.card ol{padding-left:18px}
+.card li{margin-bottom:5px}
+.card p strong,.card li strong{color:var(--text)}
+.tbl-wrap{overflow-x:auto;margin-top:4px}
+.card table{width:100%;border-collapse:collapse;font-size:13.8px;line-height:1.55}
+.card th{text-align:left;padding:9px 11px;border-bottom:2px solid var(--border);font-family:'Baloo 2',sans-serif;font-size:13px;color:var(--text)}
+.card td{padding:9px 11px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top}
+.card tr:last-child td{border-bottom:none}
+.card.hi{background:var(--hi-bg);border-color:var(--hi-b)}
+.card.hi h4{color:var(--hi-t);font-size:16.5px}
+.card.hi p,.card.hi li{color:var(--hi-t);opacity:.9}
+.card.ok{background:var(--ok-bg);border-color:var(--ok-b)}
+.card.ok h4{color:var(--ok-t)}
+.card.ok p,.card.ok li{color:var(--ok-t);opacity:.92}
+.card.danger{background:var(--no-bg);border-color:var(--no-b)}
+.card.danger h4{color:var(--no-t)}
+.card.danger p,.card.danger li{color:var(--no-t);opacity:.92}
+.card.danger th{color:var(--no-t);border-color:var(--no-b)}
+.card.danger td{color:var(--no-t);opacity:.9;border-color:var(--no-b)}
+/* FEEDBACK FLOW DIAGRAM */
+.flow{display:flex;align-items:stretch;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.flow-step{flex:1;min-width:190px;border-radius:var(--r);padding:18px 19px;box-shadow:var(--shadow);border:2px solid}
+.flow-step .fs-ic{font-size:28px;margin-bottom:8px}
+.flow-step h4{font-size:15.5px;margin-bottom:6px}
+.flow-step p{font-size:13.5px;line-height:1.55;margin:0}
+.flow-step.f-blue{background:#EAF1FF;border-color:var(--blue-l);color:var(--blue-d)}
+.flow-step.f-blue h4{color:var(--blue-d)}
+.flow-step.f-coral{background:#FFF0ED;border-color:#FFC3B8;color:var(--coral-d)}
+.flow-step.f-coral h4{color:var(--coral-d)}
+.flow-step.f-green{background:var(--ok-bg);border-color:var(--ok-b);color:var(--ok-t)}
+.flow-step.f-green h4{color:var(--ok-t)}
+.flow-arrow{display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--text-muted);flex:0 0 auto;padding:0 2px}
+@media(max-width:700px){.flow{flex-direction:column}.flow-arrow{transform:rotate(90deg);margin:-4px auto}}
+.callout{display:flex;gap:11px;border-radius:var(--rsm);padding:13px 16px;margin-bottom:11px;font-size:14px;line-height:1.65;border:1.5px solid}
+.ci{font-size:16px;flex-shrink:0;margin-top:1px}
+.cw{background:#FFF6EE;border-color:#FBD9B0;color:#9A5B12}
+.ct{background:#EFFAFF;border-color:#B9E6FA;color:#0B5E85}
+.cg{background:var(--ok-bg);border-color:var(--ok-b);color:var(--ok-t)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:560px){.two-col{grid-template-columns:1fr}}
+.divider{border:none;border-top:2px solid var(--border);margin:30px 0}
+.ctabtn{display:block;width:100%;padding:17px;background:var(--blue);color:#fff;border:none;border-radius:var(--rpill);font-family:'Baloo 2',sans-serif;font-size:18px;font-weight:700;cursor:pointer;transition:all .15s;margin-bottom:40px;margin-top:4px;box-shadow:0 4px 16px rgba(29,79,216,.28)}
+.ctabtn:hover{background:var(--coral);transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,107,84,.35)}
+@media(max-width:640px){.cbody,.msec,.hero{padding-left:18px;padding-right:18px}}
+/* QUIZ */
+.qbody{padding:38px 40px;max-width:700px;margin:0 auto;width:100%;flex:1}
+.qpt{height:8px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--rpill);margin-bottom:38px;overflow:hidden}
+.qpf{height:100%;background:linear-gradient(90deg,var(--blue),var(--coral));border-radius:var(--rpill);transition:width .4s ease}
+.qctr{font-size:12.5px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text-muted);margin-bottom:11px}
+.qtxt{font-family:'Baloo 2',sans-serif;font-size:23px;font-weight:700;letter-spacing:-.3px;line-height:1.35;margin-bottom:28px;color:var(--text)}
+.qopts{display:flex;flex-direction:column;gap:11px}
+.qopt{background:var(--surface);border:2px solid var(--border);border-radius:var(--r);padding:15px 19px;cursor:pointer;font-size:14.5px;color:var(--text);font-family:'Inter',sans-serif;font-weight:500;transition:all .15s;text-align:left;line-height:1.5;box-shadow:var(--shadow)}
+.qopt:hover:not(.answered){background:var(--opt-h);border-color:var(--blue-l)}
+.qopt.correct{background:var(--ok-bg);border-color:var(--ok-b);color:var(--ok-t)}
+.qopt.wrong{background:var(--no-bg);border-color:var(--no-b);color:var(--no-t)}
+.qopt.answered{cursor:default}
+.qfb{display:none;margin-top:15px;border-radius:var(--rsm);padding:14px 17px;font-size:14.5px;line-height:1.6;border:2px solid}
+.qfb.show{display:block}
+.qfb.ok{background:var(--ok-bg);border-color:var(--ok-b);color:var(--ok-t)}
+.qfb.bad{background:var(--no-bg);border-color:var(--no-b);color:var(--no-t)}
+.qnxt{display:none;margin-top:19px;width:100%;padding:15px;background:var(--blue);color:#fff;border:none;border-radius:var(--rpill);font-family:'Baloo 2',sans-serif;font-size:17px;font-weight:700;cursor:pointer;transition:all .15s}
+.qnxt.show{display:block}
+.qnxt:hover{background:var(--coral)}
+/* RESULTS */
+.rbody{padding:64px 40px;max-width:540px;margin:0 auto;text-align:center;flex:1}
+.remi{font-size:66px;margin-bottom:15px}
+.rtitle{font-family:'Baloo 2',sans-serif;font-size:31px;font-weight:800;letter-spacing:-.4px;color:var(--text)}
+.rpct{font-family:'Baloo 2',sans-serif;font-size:64px;font-weight:800;line-height:1;margin:15px 0 7px}
+.rpct.pass{color:var(--blue)}
+.rpct.fail{color:var(--coral)}
+.rsub{color:var(--text2);font-size:15.5px;line-height:1.65;margin-bottom:32px}
+.bdark{display:block;width:100%;padding:15px 24px;margin-bottom:10px;background:var(--blue);color:#fff;border:none;border-radius:var(--rpill);font-family:'Baloo 2',sans-serif;font-size:17px;font-weight:700;cursor:pointer;transition:all .15s}
+.bdark:hover{background:var(--coral)}
+.bline{display:block;width:100%;padding:14px 24px;margin-bottom:10px;background:transparent;color:var(--text2);border:2px solid var(--border);border-radius:var(--rpill);font-family:'Inter',sans-serif;font-size:14.5px;font-weight:700;cursor:pointer;transition:all .15s}
+.bline:hover{background:var(--surface2);color:var(--text);border-color:var(--blue-l)}
+/* CERT */
+.compbody{padding:64px 40px;max-width:620px;margin:0 auto;text-align:center;flex:1}
+.cert{background:var(--surface);border:3px solid var(--blue);border-radius:22px;padding:36px 30px;margin:30px 0;box-shadow:0 0 44px rgba(29,79,216,.14);position:relative;overflow:hidden}
+.cert::before{content:'';position:absolute;top:-60px;right:-60px;width:170px;height:170px;border-radius:50%;background:var(--blue);opacity:.08;pointer-events:none}
+.clbl2{font-family:'Inter',sans-serif;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:2px;color:var(--coral);margin-bottom:13px}
+.cert h2{font-family:'Baloo 2',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.3px;color:var(--text)}
+.cert p{color:var(--text2);margin-top:7px;font-size:14.5px}
+.cmods{display:flex;justify-content:center;gap:9px;margin-top:22px;flex-wrap:wrap}
+.cmod{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;background:#EAF2FF}
+/* CHECKLIST */
+.chk-body{padding:44px 40px 64px;max-width:720px;margin:0 auto;flex:1}
+.chk-badge{display:inline-flex;align-items:center;gap:6px;background:#DCEBFF;color:var(--blue-d);border:2px solid var(--blue-l);border-radius:var(--rpill);padding:6px 15px;font-family:'Inter',sans-serif;font-size:12.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:16px}
+.chk-h1{font-family:'Baloo 2',sans-serif;font-size:clamp(24px,4vw,34px);font-weight:800;letter-spacing:-.6px;line-height:1.15;color:var(--text);margin-bottom:12px}
+.chk-sub{font-size:15.5px;color:var(--text2);line-height:1.7;margin-bottom:30px}
+.chk-list{display:flex;flex-direction:column;gap:12px}
+.chk-item{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:2px solid var(--border);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow)}
+.chk-ic{width:34px;height:34px;border-radius:50%;background:#DCEBFF;color:var(--blue-d);display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;font-family:'Baloo 2',sans-serif}
+.chk-txt{font-size:14.5px;color:var(--text2);line-height:1.65;padding-top:5px}
+.chk-txt strong{color:var(--text)}
+.chk-selfeval{margin-top:36px;background:var(--surface2);border:2px dashed var(--blue-l);border-radius:var(--r);padding:24px 26px}
+.chk-selfeval-h{font-family:'Baloo 2',sans-serif;font-size:20px;font-weight:800;color:var(--text);margin-bottom:6px}
+.chk-selfeval-sub{font-size:13.5px;color:var(--text-muted);margin-bottom:16px;line-height:1.55}
+.chk-self-item{display:flex;gap:10px;margin-bottom:11px;font-size:14.5px;color:var(--text2);line-height:1.6}
+.chk-self-item:last-child{margin-bottom:0}
+.chk-self-ic{flex-shrink:0;font-size:15px}
+.chk-actions{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+.chk-actions button{flex:1;min-width:220px;margin-bottom:0}
+@media(max-width:640px){.chk-body{padding-left:18px;padding-right:18px}}
+@media print{
+  .nav,.no-print{display:none!important}
+  body{background:#fff}
+  .chk-body{padding:10px 6px;max-width:100%}
+  .chk-item,.chk-selfeval{box-shadow:none;break-inside:avoid}
+}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="screen-home" class="screen active">
+  <nav class="nav">
+    <a class="logo" href="#" onclick="goHome();return false;">
+      <span class="logo-mark">kodland</span>
+      <span class="logo-div"></span>
+      <span class="logo-sub">Tutor Development Department</span>
+    </a>
+    <div class="nav-r">
+      <div class="lang-wrap">
+        <button class="lang-btn" onclick="toggleLang(event)">🌐 EN <span style="font-size:10px">▾</span></button>
+        <div class="lang-menu" id="langMenu">
+          <div class="lang-item active">🇬🇧 English</div>
+          <div class="lang-item disabled">🇪🇸 Español <span class="lang-soon">Soon</span></div>
+          <div class="lang-item disabled">🇧🇷 Português <span class="lang-soon">Soon</span></div>
+          <div class="lang-item disabled">🇮🇹 Italiano <span class="lang-soon">Soon</span></div>
+          <div class="lang-item disabled">🇵🇱 Polski <span class="lang-soon">Soon</span></div>
+          <div class="lang-item disabled">🇮🇩 Indonesia <span class="lang-soon">Soon</span></div>
+          <div class="lang-item disabled">🇹🇷 Türkçe <span class="lang-soon">Soon</span></div>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="eyebrow">📊 Tutor Training Program</div>
+      <h1>Boost Your Students'<br><span class="h-pill">Attendance</span></h1>
+      <p>Welcome to this training! You're probably here for one of two reasons:</p>
+      <div class="hero-reasons">
+        <div class="hr-item"><span>📉</span>Your attendance percentage is low and you want to understand how to turn it around.</div>
+        <div class="hr-item"><span>🌱</span>You're about to start a new course and want to keep your students with you until the end.</div>
+      </div>
+      <p>Work through 5 modules, pass a final exam, and unlock the essentials checklist. Score 70%+ to move forward at every step.</p>
+      <button class="start-btn" onclick="goDashboard()">🚀 Start Training</button>
+    </div>
+  </div>
+</div>
+
+<!-- LEARNING PATH / DASHBOARD -->
+<div id="screen-path" class="screen">
+  <nav class="nav">
+    <a class="logo" href="#" onclick="goHome();return false;">
+      <span class="logo-mark">kodland</span>
+      <span class="logo-div"></span>
+      <span class="logo-sub">Tutor Development Department</span>
+    </a>
+    <div class="nav-r">
+      <span id="ntag" style="font-size:13px;color:var(--text-muted);font-weight:700;display:none"></span>
+    </div>
+  </nav>
+  <div class="msec">
+    <div class="slbl">Your learning path</div>
+    <div class="route" id="mgrid"></div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div id="screen-content" class="screen">
+  <nav class="nav">
+    <a class="logo" href="#" onclick="goHome();return false;">
+      <span class="logo-mark">kodland</span>
+      <span class="logo-div"></span>
+      <span class="logo-sub">Tutor Development Department</span>
+    </a>
+    <div class="nav-r"><button class="pbtn" onclick="goDashboard()">← Modules</button></div>
+  </nav>
+  <div class="cbody" id="cbody"></div>
+</div>
+
+<!-- QUIZ -->
+<div id="screen-quiz" class="screen">
+  <nav class="nav">
+    <a class="logo" href="#" onclick="goHome();return false;">
+      <span class="logo-mark">kodland</span>
+      <span class="logo-div"></span>
+      <span class="logo-sub">Tutor Development Department</span>
+    </a>
+    <div class="nav-r"><button class="pbtn" onclick="exitQuiz()">← Exit Check</button></div>
+  </nav>
+  <div class="qbody">
+    <div class="qpt"><div class="qpf" id="qfill"></div></div>
+    <div class="qctr" id="qcount"></div>
+    <div class="qtxt" id="qtext"></div>
+    <div class="qopts" id="qopts"></div>
+    <div class="qfb" id="qfb"></div>
+    <button class="qnxt" id="qnxt" onclick="nextQ()">Next →</button>
+  </div>
+</div>
+
+<!-- RESULTS -->
+<div id="screen-results" class="screen">
+  <nav class="nav">
+    <a class="logo" href="#" onclick="goHome();return false;">
+      <span class="logo-mark">kodland</span>
+      <span class="logo-div"></span>
+      <span class="logo-sub">Tutor Development Department</span>
+    </a>
+    <div class="nav-r"><button class="pbtn" onclick="goDashboard()">← Modules</button></div>
+  </nav>
+  <div class="rbody" id="rbody"></div>
+</div>
+
+<!-- CERTIFICATE -->
+<div id="screen-complete" class="screen">
+  <nav class="nav">
+    <a class="logo" href="#" onclick="goHome();return false;">
+      <span class="logo-mark">kodland</span>
+      <span class="logo-div"></span>
+      <span class="logo-sub">Tutor Development Department</span>
+    </a>
+    <div class="nav-r"><button class="pbtn" onclick="goDashboard()">← Dashboard</button></div>
+  </nav>
+  <div class="compbody" id="compbody"></div>
+</div>
+
+<!-- CHECKLIST -->
+<div id="screen-checklist" class="screen">
+  <nav class="nav">
+    <a class="logo" href="#" onclick="goHome();return false;">
+      <span class="logo-mark">kodland</span>
+      <span class="logo-div"></span>
+      <span class="logo-sub">Tutor Development Department</span>
+    </a>
+    <div class="nav-r"><button class="pbtn" onclick="goDashboard()">← Dashboard</button></div>
+  </nav>
+  <div class="chk-body">
+    <div class="chk-badge">✅ Certified</div>
+    <div class="chk-h1">Your Attendance Essentials Checklist</div>
+    <p class="chk-sub">Keep this nearby. These are the seven habits from the training that move the needle most — in the order they show up in a real class.</p>
+    <div class="chk-list" id="chkList"></div>
+    <div class="chk-selfeval">
+      <div class="chk-selfeval-h">🪞 Self-Check: Ask Yourself</div>
+      <div class="chk-selfeval-sub">Not graded — just a quick, honest check-in with yourself before or after class.</div>
+      <div id="chkSelf"></div>
+    </div>
+    <div class="chk-actions no-print">
+      <button class="bdark" onclick="window.print()">⬇️ Download as PDF</button>
+      <button class="bline" onclick="goDashboard()">← Back to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ──────────────────────────────────────────────────────────────────
+const TOTAL=5;
+let currentModule=null, quizData=[], qi=0, score=0;
+const PROG_KEY='kl-att-progress';
+
+const MODULES=[
+{id:1,emoji:'📊',title:'Understanding the Metric: Attendance',desc:'How attendance is measured, what LPR/HPR mean for you, and the two types of causes behind a missed class.',obj:'Understand how attendance is measured and separate the causes you can influence from the ones you can\'t.',color:'#1D4FD8',noQuiz:true,
+ sections:[
+  {t:'📐 How Is It Measured?',cards:[
+    {type:'text',b:'We classify students (SS) into three levels based on their attendance percentage.'},
+    {type:'table',h:'Attendance levels',head:['Level','Range'],rows:[['🟢 High Presence','≥ 75%'],['🟠 Medium Presence (Risk)','50% – 74.99%'],['❗ Low Presence (Alert)','&lt; 50%']]},
+    {type:'text',h:'From the tutor\'s perspective',b:'Two indicators sum up your performance on this metric:<br><br><strong>LPR (Low Presence Rate):</strong> % of your student cases with attendance below 50%.<br><strong>HPR (High Presence Rate):</strong> % of your student cases with attendance at or above 75%.'},
+  ]},
+  {t:'🔍 What Causes a Student to Miss Class?',cards:[
+    {type:'twocol',left:{h:'🌦️ External (outside your control)',items:['Vacations','Illness','Family issues','National holidays']},right:{h:'🎯 Internal (you can influence these)',items:['They\'re bored in class','They don\'t feel heard','They feel they\'re “not good” at this','They\'re confused and lost']}},
+  ]},
+  {t:'⛓️ The Domino Effect',cards:[
+    {type:'hi',h:'One missed class rarely stays just one missed class',b:'Misses class → gets discouraged → loses motivation to continue → the group falls apart → your income as a tutor drops.'},
+    {type:'text',b:'The good news: the internal causes — the ones we <em>can</em> change — are the focus of the rest of this training.'},
+  ]},
+ ]},
+
+{id:2,emoji:'🤝',title:'Building a Bond With Your Students',desc:'Small talk, feedback that actually lands, and how to make every student feel like part of the group.',obj:'Learn how to build a valuable bond with your students that makes them want to come back.',color:'#1D4FD8',
+ sections:[
+  {t:'💙 Why This Matters',cards:[
+    {type:'text',b:'At Kodland, our students take an extracurricular course — it\'s not mandatory. Unlike school, nothing forces them to come back. That\'s why the bond with the tutor and the group isn\'t a nice extra: it\'s the reason they return. Here are the keys and everyday opportunities you have in class to build it.'},
+  ]},
+  {t:'👋 Small Talk at the Start of Class',cards:[
+    {type:'hi',h:'The first 5 minutes change everything',b:'A warm start makes a student feel safe. A safe student is one who tries, fails, learns, and comes back.'},
+    {type:'doavoid',left:{h:'✅ What to Do',items:['Greet warmly: “I\'m so glad you\'re here”','Ask something personal, briefly','Introduce the lesson with energy: “Today we\'re building something amazing”','Reinforce psychological safety: “Mistakes are part of learning”']},right:{h:'❌ What to Avoid',items:['Jumping straight into content: “Let\'s open the activity”','Skipping the greeting','Not explaining what you\'ll do or why','Rushing or sounding stressed']}},
+    {type:'text',b:'Those minutes of chat — at the start, at the end, or during an activity — are what show a student they\'re a person, not just another name on your class list.'},
+    {type:'img',src:'Images/image1.png'},
+  ]},
+  {t:'💬 Constructive Feedback',cards:[
+    {type:'text',b:'Feedback is another key piece of building that connection. It\'s not about making students feel like everything they do is perfect — it\'s about guiding their learning process and helping them understand exactly what they\'re doing well. A generic compliment like “nice” or “I like it”, repeated too often, starts to sound like the opposite: I don\'t really care about your work, it\'s not that important. Let\'s show our students we know exactly what we like about their work — because we\'re really looking at it.'},
+    {type:'text',h:'A simple scheme for better feedback',b:'Use this three-step flow, in order, to give more constructive feedback:'},
+    {type:'flow',steps:[
+      {ic:'🔦',h:'Highlight',b:'Point out one decision the student made — explain why it works in terms of its effect, not its quality.<br><br><em>Example:</em> “You set up the button so it only changes color when the player hovers over it exactly where you want — that small detail makes the whole page feel intentional.”',color:'blue'},
+      {ic:'❓',h:'Ask',b:'Ask with genuine curiosity, treating the student as the authority on their own work.<br><br><em>Example:</em> “Did you imagine them as a group from the start, or did one lead to the next as you were drawing?”',color:'coral'},
+      {ic:'➡️',h:'Activate',b:'Offer a real, open choice for what comes next.<br><br><em>Example:</em> “Want to give them a story — who they are, where they\'re headed? Or if you feel it\'s already complete, that\'s valid too.”',color:'green'},
+    ]},
+    {type:'table',h:'⚠️ Common feedback mistakes',tone:'danger',head:['Mistake','Why you shouldn\'t do this'],rows:[
+      ['“Great job!” with no specifics','The student can\'t repeat a success they don\'t understand'],
+      ['Focusing on the result, not the process','Creates dependence on the tutor\'s judgment'],
+      ['Correcting without guiding','Removes agency — the student waits for corrections instead of building their own judgment'],
+      ['Several corrections at once','Cognitive overload — at this age, students process 1–2 pieces of feedback at a time'],
+    ]},
+    {type:'img',src:'Images/image2.png'},
+  ]},
+  {t:'🎉 Inviting Participation & Building Camaraderie',cards:[
+    {type:'text',b:'Students don\'t come back to class only because they like the topic — they come back because they\'ve found a safe space to talk, be themselves, meet peers their age with similar interests, and build the same dreams. One of the ways we build that space is by encouraging participation and camaraderie in a friendly, genuine way:'},
+    {type:'hi',h:'💡 A child\'s brain calms down when an authority figure pays real attention',b:'If you don\'t actively notice their progress, they feel invisible — and an invisible student is one who stops looking forward to class.'},
+    {type:'doavoid',left:{h:'✅ What to Do',items:['Name specific wins: “Lucas, I noticed your logic is really clean”','Use chat and reactions so everyone can join in real time','Celebrate effort: “You tried three different approaches — that\'s strategic thinking”','Rotate your attention during independent work — don\'t leave anyone unchecked']},right:{h:'❌ What to Avoid',items:['Generic praise: “Good job, everyone”','Only noticing the ones who finish fast','The same pace for the whole group (bores the fast ones, rushes the slow ones)','Leaving slower students without support']}},
+    {type:'text',h:'Ways to participate',b:'Not everyone feels comfortable the same way. All of these are valid, as long as they follow class rules: camera, mic, or chat only; backgrounds and reactions that reflect their personality; open questions for some, closed ones for others.'},
+    {type:'list',h:'How to build camaraderie',items:[
+      'Create small group rituals — a greeting, a phrase, or a “challenge of the week” unique to your class',
+      'Invite students to comment (respectfully) on a classmate\'s work: “What did you like about what [name] made?”',
+      'Celebrate group wins, not only individual ones',
+      'Use pair or small-group work when the activity allows it',
+      'Remember details between classes — if someone mentioned something last week, ask how it went',
+    ]},
+    {type:'img',src:'Images/image3.png'},
+  ]},
+  {t:'⚖️ Balancing Skill Levels',cards:[
+    {type:'text',b:'Not every student moves at the same pace — and that\'s completely normal. The goal isn\'t to make anyone stand out or feel left behind; it\'s to let each student progress at their own speed, without anyone feeling singled out.'},
+    {type:'twocol',left:{h:'🚀 For Faster Students',items:['Offer extra challenges that take their work to the next level','Turn them into class helpers or “monitors” for a moment','Encourage them to ask themselves deeper questions about their own work','Give them room to explore beyond the base activity']},right:{h:'🌱 For Students Who Need More Time',items:['Offer direct support and check in more often','Simplify steps — break the task into smaller pieces','Celebrate progress, not just the finished result','Give them the time they need without rushing the group']}},
+    {type:'hi',h:'Remember',b:'We all start with the basics. Normalize mistakes — the goal is progress at each student\'s own pace, never comparison between students.'},
+    {type:'img',src:'Images/image4.png'},
+  ]},
+ ]},
+
+{id:3,emoji:'✨',title:'Creating Unforgettable Classes',desc:'Visual material, modeling before practice, checking for understanding, and closing with anticipation.',obj:'Learn the four habits that turn an ordinary class into one students don\'t want to miss.',color:'#1D4FD8',
+ sections:[
+  {t:'🌟 What Makes a Class Unforgettable',cards:[
+    {type:'text',b:'An unforgettable class comes from an experience outside the ordinary: a tutor who listens, a practice where the student\'s opinion matters, challenges for those moving faster and support for those who need more help, and a class where mistakes aren\'t judged — they\'re learned from.'},
+    {type:'img',src:'Images/image5.gif'},
+    {type:'text',b:'To understand what makes a class unforgettable, we looked at which quality aspects correlate most strongly with the best classes. Here they are:'},
+  ]},
+  {t:'🖼️ Visual Material',cards:[
+    {type:'text',b:'Visuals aren\'t decoration — they\'re what turns an abstract idea into something understood in seconds. Before explaining with words, show an example, an image, or a live demo on screen. Visual material is a key tool in virtual learning environments — it takes teaching to another level. Students don\'t just learn by doing, they learn by seeing. This connects strongly with the next habit:'},
+  ]},
+  {t:'🎬 Model Before Practice',cards:[
+    {type:'text',b:'Never ask a student to do something they haven\'t seen done first. Modeling the process step by step — thinking out loud as you go — gives them a clear map of what\'s expected, and cuts down the frustration of “I don\'t know where to start.” Before practice starts, give students a clear signal of what\'s coming: “Everyone, eyes on my screen in the classroom — I\'m going to show you how this works, and once I\'m done, you\'ll do it yourselves.” Clear expectations about the order of the class — and what happens right after the tutor models — keep the group focused and reduce anxiety about what comes next.'},
+  ]},
+  {t:'✅ Check for Understanding',cards:[
+    {type:'text',b:'Don\'t wait until the end of class to discover something wasn\'t clear. Use different methods depending on the group: quick chat questions, emoji reactions, or asking students to share their screen. Checking in often also shows students that you care whether they actually learn — not just whether they moved on.'},
+  ]},
+  {t:'🚀 Build Anticipation for Next Class',cards:[
+    {type:'text',b:'Close class by connecting what\'s coming next to something your students actually care about. A great closing line does more work than a great opening one — it\'s the reason a student wants to come back.'},
+    {type:'list',h:'Examples that land',items:[
+      '<strong>Graphic design:</strong> “Next class we\'re entering the web page module — for everyone who told me on day one they\'d build a page for their favorite band, that moment is almost here.”',
+      '<strong>Programming:</strong> “Next lesson you\'ll learn to save progress — so the game you\'ve been building will finally remember who won.”',
+      '<strong>Roblox / Minecraft:</strong> “Next class is the first time you\'ll publish something other players can actually see. Get ready.”',
+    ]},
+    {type:'text',b:'A good closing isn\'t just “see you next time” — it\'s planting the seed of something they want to see finished themselves.'},
+  ]},
+ ]},
+
+{id:4,emoji:'📝',title:'Homework and Attendance',desc:'Explain, remind, highlight, and review — the four homework habits that reinforce attendance.',obj:'Turn homework from a metric into another way to strengthen your bond with students and their families.',color:'#1D4FD8',
+ sections:[
+  {t:'🎯 Homework Is More Than a Metric',cards:[
+    {type:'text',b:'Handled well, homework reinforces the bond, gives you a second chance at feedback, and shows students — and their parents — that their progress matters outside the live class.'},
+    {type:'img',src:'Images/image6.png'},
+  ]},
+  {t:'📣 Explain the Homework',cards:[
+    {type:'text',b:'Don\'t mention it in passing at the end of class. Explain what to do and, above all, <strong>why</strong> — how it connects to what they just learned. Homework without a clear purpose is the first thing forgotten.'},
+  ]},
+  {t:'⏰ Remind About the Homework',cards:[
+    {type:'text',b:'A short reminder close to the deadline dramatically improves submission rates. It can be as simple as a message, or a quick mention at the start of the next class: “Has anyone already started the project?”'},
+  ]},
+  {t:'🌟 Highlight the Homework During Class',cards:[
+    {type:'text',b:'Give it visibility — and make sure every student gets a moment, not just the strongest project. Look for something specific and positive in each student\'s work, even if it\'s a single sentence: “I saw you fixed that bug on your own, that\'s not easy!” If your group is large and there isn\'t time to go through every submission live, highlight something collective for everyone who turned it in: “90% of the group brought their homework complete — that commitment shows.”'},
+    {type:'hi',h:'This is not a place for judgment',b:'The goal is to motivate — never to make a student feel bad or afraid because they didn\'t submit.'},
+  ]},
+  {t:'🔎 Review the Homework',cards:[
+    {type:'text',b:'Reviewing isn\'t just marking “done” or “not done.” It\'s a chance to leave a detailed comment that parents and students can read — reinforcing that there\'s a real person, not just a platform, following their progress.'},
+  ]},
+ ]},
+
+{id:5,emoji:'📞',title:'What to Do When a Student Misses Class',desc:'How to follow up with the student and how to talk to parents with empathy.',obj:'Know exactly what steps to take — with the student and with their family — when an absence happens.',color:'#1D4FD8',
+ sections:[
+  {t:'🔁 Follow Up',cards:[
+    {type:'list',items:[
+      'Ask the parent or guardian how the student is doing, and mention that they were missed in class.',
+      'Share the class recording along with a short recap of the homework, so the student doesn\'t fall behind or lose motivation.',
+      'The next time the student attends, show them you noticed their absence — ask how they\'re doing and remind them where to find the recording and the homework.',
+    ]},
+    {type:'img',src:'Images/image7.png'},
+  ]},
+  {t:'👨‍👩‍👧 Talking With Parents',cards:[
+    {type:'list',items:[
+      'Be kind and understanding, especially if the absence was due to illness or a family issue.',
+      'If there\'s extra material available in the course, let them know.',
+      'When the student does attend, use the moment to share their achievements in class with the parents.',
+    ]},
+    {type:'warnbox',h:'⚠️ Before offering an extra class',b:'If you think an extra or motivational class is needed, <strong>contact your TL first</strong> to review the case before proposing it to the parent or guardian.'},
+  ]},
+ ]},
+];
+
+const CHECKLIST=[
+  'Greet and connect before teaching — the first 5 minutes matter.',
+  'Build a real bond — small talk, genuine curiosity about their world, and remembering details between classes.',
+  'Create a safe, judgment-free environment where mistakes are normal and every student can grow at their own pace.',
+  'Give feedback that highlights the process, not just the result.',
+  'Balance skill levels — challenges for faster students, support and simpler steps for those who need more time.',
+  'Encourage participation and camaraderie in a friendly, genuine way — students come back for the group, not only the topic.',
+  'Check for understanding before moving on.',
+  'Close class by building anticipation for what\'s next.',
+  'Explain, remind, highlight, and review homework — every step counts.',
+  'If a student misses class, follow up with them and with their family.',
+  'Talk to parents with empathy, and loop in your TL before offering an extra class.',
+];
+
+const SELF_QUESTIONS=[
+  'Did I greet my students warmly today, before jumping into the content?',
+  'Have I given at least one piece of process-focused feedback this week — not just “great job”?',
+  'Is there a student in my group who might be feeling invisible right now?',
+  'Am I giving my faster students real challenges, and my slower students real support — without singling anyone out?',
+  'Did I build anticipation for the next class before saying goodbye?',
+  'Have I reached out to every parent whose child missed a class recently?',
+  'Do my students feel this is a safe space to be themselves and make mistakes?',
+];
+
+// Per-module knowledge checks (gate the next module)
+const QUIZ={
+1:[
+ {q:'Which attendance range counts as Low Presence (Alert)?',opts:['Below 50%','50%–74.99%','75% and above'],c:0,fb:'Low Presence (Alert) means attendance under 50% — the range that needs your attention first.'},
+ {q:'What does LPR measure, from a tutor\'s perspective?',opts:['The % of your student cases with attendance below 50%','Your students\' average grade','How many classes you taught this month'],c:0,fb:'LPR (Low Presence Rate) is the share of your student cases falling below 50% attendance.'},
+],
+2:[
+ {q:'Which of these is encouragement rather than praise?',opts:['“You\'re so talented!”','“I saw how carefully you built up those layers.”','“Perfect, amazing work!”'],c:1,fb:'Encouragement points at what the student actually did — the process — not at their identity.'},
+ {q:'True or false: repeating a generic compliment like “nice job” too often can start to feel like you don\'t really care.',opts:['True','False'],c:0,fb:'Exactly — generic praise loses meaning fast, and students notice.'},
+],
+3:[
+ {q:'What should happen right before students practice something new?',opts:['Nothing — they figure it out on their own','The tutor models the process step by step','A written test'],c:1,fb:'Modeling first gives students a clear map before they try it themselves.'},
+ {q:'Why build anticipation for the next class?',opts:['It gives students a reason to come back','It fills time at the end of class','It\'s required by the platform'],c:0,fb:'A strong hook at the end is often the real reason a student shows up next time.'},
+],
+4:[
+ {q:'What\'s the goal of “highlighting homework”?',opts:['Give every student a specific, positive moment','Publicly point out who didn\'t submit','Only showcase the single best project'],c:0,fb:'The goal is motivation, not comparison or shame.'},
+ {q:'True or false: reviewing homework is only useful as a tutor metric.',opts:['True','False'],c:1,fb:'Reviewing homework is also a feedback opportunity that strengthens your connection with students and parents.'},
+],
+5:[
+ {q:'Before offering a parent an extra class, you should:',opts:['Contact your TL first','Just schedule it directly','Wait until the student asks'],c:0,fb:'Always loop in your TL before proposing an extra class to a parent.'},
+ {q:'What\'s a good first step when a student misses class?',opts:['Ignore it, they\'ll catch up','Check in with the parent or guardian','Lower their grade'],c:1,fb:'A caring check-in is the first step — before anything else.'},
+],
+};
+
+// Final exam — 12 questions across Modules 2–5 (Module 1 excluded), with case-based scenarios
+const FINAL_EXAM=[
+ {q:'A student joins class visibly quiet, giving one-word answers. What\'s the best way to start the lesson?',opts:['Skip straight to today\'s activity so they don\'t feel singled out','Take a moment for warm, genuine small talk before diving in','Ask them directly, in front of the group, why they\'re being so quiet'],c:1,fb:'A warm, low-pressure start is what helps a quiet student feel safe before anything else happens.'},
+ {q:'Which of these is encouragement rather than praise?',opts:['“You\'re so talented!”','“I saw how carefully you built up those layers.”','“Perfect, amazing work!”'],c:1,fb:'Encouragement points at what the student actually did — the process — not at their identity.'},
+ {q:'True or false: repeating a generic compliment like “nice job” too often can start to feel like you don\'t really care about the student\'s work.',opts:['True','False'],c:0,fb:'Exactly — generic praise loses meaning fast, and students notice.'},
+ {q:'During independent work, two students finish quickly while three are still struggling. What should you do?',opts:['Move on once the fast ones are done, since most of the class is ready','Rotate your attention — check in with the students who are struggling without abandoning the ones who finished','Give the fast finishers extra credit and let the others catch up on their own'],c:1,fb:'Rotating attention is what keeps both groups engaged instead of leaving one of them behind.'},
+ {q:'You\'re about to introduce a brand-new tool students have never used before. What\'s the right next step?',opts:['Give them the instructions and let them explore on their own','Model the process step by step before they try it themselves','Show a finished example and move straight to the assignment'],c:1,fb:'Modeling first gives students a clear map before they try it themselves.'},
+ {q:'What\'s the main reason to build anticipation for the next class?',opts:['It fills time at the end of class','It\'s required by the platform','It gives students a real reason to come back'],c:2,fb:'A strong hook at the end is often the real reason a student shows up next time.'},
+ {q:'True or false: checking for understanding should only happen at the very end of class, once the lesson is complete.',opts:['True','False'],c:1,fb:'False — check in throughout the class, not only at the end, so nothing slips by unnoticed.'},
+ {q:'You have limited time to review homework for a large group. A few submitted outstanding projects, and several submitted basic work. What\'s the best approach?',opts:['Showcase only the best projects so students see what excellence looks like','Give each student a specific positive comment, and highlight something collective for everyone who submitted','Skip highlighting altogether since time is limited'],c:1,fb:'Every student gets a moment — individually if you can, collectively if time is tight. Never just the top project.'},
+ {q:'Why is it important to explain the purpose of homework, not just assign it?',opts:['Because tasks without a clear “why” are the first thing students forget','Because it\'s a formal requirement from the platform','Because parents ask about it often'],c:0,fb:'A clear purpose is what makes homework worth remembering.'},
+ {q:'A student has missed the last two classes and their parent hasn\'t reached out. What should you do first?',opts:['Wait for the parent to contact you','Reach out to the parent or guardian to check in and let them know the student was missed','Lower the student\'s engagement score and move on'],c:1,fb:'A proactive, caring check-in is always the first step.'},
+ {q:'A parent asks if their child can get an extra class to catch up. What\'s the correct next step?',opts:['Schedule the extra class directly with the parent','Tell the parent it\'s not possible','Contact your TL first to review the case before proposing anything'],c:2,fb:'TL first, always — before anything is proposed to the parent.'},
+ {q:'True or false: sharing the class recording and a quick homework recap with a student who missed class helps them stay on track and motivated.',opts:['True','False'],c:0,fb:'True — it keeps them from falling behind and losing motivation.'},
+ {q:'Before proposing an extra class to a parent, a tutor should:',opts:['Contact their TL first','Decide alone and inform the TL after','Ask the student directly'],c:0,fb:'TL first, always — before anything reaches the parent.'},
+];
+
+// ─── PROGRESS ────────────────────────────────────────────────────────────
+function getProgress(){ try{ return JSON.parse(localStorage.getItem(PROG_KEY)||'{}'); }catch(e){ return {}; } }
+function saveProgress(p){ localStorage.setItem(PROG_KEY, JSON.stringify(p)); }
+function isPassed(id){ if(id===1) return true; const p=getProgress(); return p[id]?.passed===true; }
+function getScore(id){ const p=getProgress(); return p[id]?.score||0; }
+function setResult(id, pct, passed){
+  const p=getProgress(); const prev=p[id]||{};
+  p[id]={passed: passed||prev.passed===true, score: Math.max(pct, prev.score||0)};
+  saveProgress(p);
+}
+
+// ─── HOME / DASHBOARD ───────────────────────────────────────────────────
+function renderHome(){
+  const done = MODULES.filter(m=>isPassed(m.id)).length;
+  const tag=document.getElementById('ntag');
+  if(done>0){tag.style.display='inline';tag.textContent=done===TOTAL?'🏆 All modules done!':done+'/'+TOTAL+' complete';}else tag.style.display='none';
+  const g=document.getElementById('mgrid'); g.innerHTML='';
+
+  MODULES.forEach((m,i)=>{
+    const prevNoQuiz = i>0 && MODULES[i-1].noQuiz;
+    const prev = i===0 || prevNoQuiz ? true : isPassed(MODULES[i-1].id);
+    const isDone = isPassed(m.id);
+    const locked = !prev;
+    const step=document.createElement('div'); step.className='rstep';
+    const node=document.createElement('div');
+    node.className='rnode'+(locked?' locked':(m.noQuiz?' reading':''));
+    node.textContent=m.id;
+    const el=document.createElement('div');
+    el.className='mc rcard'+(locked?' locked':'')+(isDone?' done':'');
+    let badge, stag;
+    if(m.noQuiz){
+      badge='<span class="badge br">📖 Reading</span>';
+      stag='<span class="stag">No test required</span>';
+    }else{
+      const pct=getScore(m.id);
+      badge=isDone?'<span class="badge bd">✓ Completed</span>':locked?'<span class="badge bl">🔒 Locked</span>':'<span class="badge bs">Start</span>';
+      stag=isDone?`<span class="stag">Score: <b>${pct}%</b></span>`:locked?`<span class="stag">Complete Module ${m.id-1}</span>`:'<span class="stag">Has a check</span>';
+    }
+    el.innerHTML=`<div class="mc-stripe" style="background:${m.color}"></div>
+    <div class="mc-body">
+      <div class="mc-top"><div class="mc-num">Module ${m.id}</div><div class="mc-em">${m.emoji}</div></div>
+      <div class="mc-title">${m.title}</div>
+      <div class="mc-desc">${m.desc}</div>
+      <div class="mc-foot">${badge}${stag}</div>
+    </div>`;
+    if(!locked) el.onclick=()=>openModule(m);
+    step.appendChild(node); step.appendChild(el);
+    g.appendChild(step);
+  });
+
+  // Final exam step
+  const allDone=MODULES.every(m=>isPassed(m.id));
+  const examPassed=isPassed('final');
+  const examStep=document.createElement('div'); examStep.className='rstep';
+  const examNode=document.createElement('div'); examNode.className='rnode'+(allDone?' coral':' locked'); examNode.textContent='🎓';
+  const examEl=document.createElement('div');
+  examEl.className='mc rcard'+(allDone?(examPassed?' done':''):' locked');
+  const examBadge=examPassed?'<span class="badge bd">✓ Completed</span>':allDone?'<span class="badge bs">Open Form</span>':'<span class="badge bl">🔒 Locked</span>';
+  const examStag=examPassed?`<span class="stag">Certified ✓</span>`:allDone?'<span class="stag">Opens in Google Forms</span>':'<span class="stag">Complete all modules</span>';
+  examEl.innerHTML=`<div class="mc-stripe" style="background:linear-gradient(90deg,var(--blue),var(--coral))"></div>
+  <div class="mc-body">
+    <div class="mc-top"><div class="mc-num">Final Stage</div><div class="mc-em">🎓</div></div>
+    <div class="mc-title">Final Exam</div>
+    <div class="mc-desc">Complete the official 12-question exam (Google Form) covering Modules 2–5 to get certified.</div>
+    <div class="mc-foot">${examBadge}${examStag}</div>
+  </div>`;
+  if(allDone) examEl.onclick=()=>startExam();
+  examStep.appendChild(examNode); examStep.appendChild(examEl);
+  g.appendChild(examStep);
+
+  // Checklist step
+  const chkStep=document.createElement('div'); chkStep.className='rstep';
+  const chkNode=document.createElement('div'); chkNode.className='rnode'+(examPassed?'':' locked'); chkNode.textContent='✅';
+  const chkEl=document.createElement('div');
+  chkEl.className='mc rcard'+(examPassed?' done':' locked');
+  chkEl.innerHTML=`<div class="mc-stripe" style="background:var(--coral)"></div>
+  <div class="mc-body">
+    <div class="mc-top"><div class="mc-num">Bonus</div><div class="mc-em">✅</div></div>
+    <div class="mc-title">Attendance Checklist</div>
+    <div class="mc-desc">Habits, bond-building, and self-check questions — plus a PDF download. Unlocked once you're certified.</div>
+    <div class="mc-foot">${examPassed?'<span class="badge bd">✓ Unlocked</span>':'<span class="badge bl">🔒 Locked</span>'}<span class="stag">Reference card</span></div>
+  </div>`;
+  if(examPassed) chkEl.onclick=()=>showChecklist();
+  chkStep.appendChild(chkNode); chkStep.appendChild(chkEl);
+  g.appendChild(chkStep);
+}
+
+// ─── MODULE CONTENT ───────────────────────────────────────────────────────
+function openModule(m){
+  currentModule=m.id;
+  let html=`<div class="meyebrow">Module ${m.id} of ${TOTAL}</div><div class="mh1">${m.emoji} ${m.title}</div><div class="mobj"><strong>Objective:</strong> ${m.obj}</div>`;
+  m.sections.forEach(s=>{html+=`<div class="sch">${s.t}</div>`;s.cards.forEach(c=>{html+=rc(c);});});
+  html+='<hr class="divider">';
+  if(m.noQuiz){
+    const next=MODULES.find(x=>x.id===m.id+1);
+    html+=next?`<button class="ctabtn" onclick="completeReading(${m.id})">✅ Continue to Module ${next.id} →</button>`:`<button class="ctabtn" onclick="goDashboard()">✅ Back to Dashboard</button>`;
+  }else{
+    const lbl=isPassed(m.id)?'🔄 Retake the Check':'📝 Take the Knowledge Check →';
+    html+=`<button class="ctabtn" onclick="startQuiz(${m.id})">${lbl}</button>`;
+  }
+  document.getElementById('cbody').innerHTML=html;
+  showScreen('screen-content');
+  window.scrollTo(0,0);
+}
+function completeReading(id){
+  setResult(id,100,true);
+  const next=MODULES.find(x=>x.id===id+1);
+  if(next) openModule(next); else goDashboard();
+}
+
+function rc(c){
+  if(c.type==='text')return`<div class="card">${c.h?`<h4>${c.h}</h4>`:''}<p>${c.b}</p></div>`;
+  if(c.type==='hi')return`<div class="card hi">${c.h?`<h4>${c.h}</h4>`:''}<p>${c.b}</p></div>`;
+  if(c.type==='warnbox')return`<div class="card danger">${c.h?`<h4>${c.h}</h4>`:''}<p>${c.b}</p></div>`;
+  if(c.type==='table'){
+    const head=c.head.map(h=>`<th>${h}</th>`).join('');
+    const rows=c.rows.map(r=>`<tr>${r.map(x=>`<td>${x}</td>`).join('')}</tr>`).join('');
+    const cls='card'+(c.tone==='danger'?' danger':'');
+    return`<div class="${cls}">${c.h?`<h4>${c.h}</h4>`:''}<div class="tbl-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div></div>`;
+  }
+  if(c.type==='img')return`<div class="card" style="padding:0;overflow:hidden"><img src="${c.src}" alt="" style="display:block;width:100%;height:auto"></div>`;
+  if(c.type==='warn')return`<div class="callout cw"><span class="ci">⚠️</span><span>${c.txt}</span></div>`;
+  if(c.type==='tip')return`<div class="callout ct"><span class="ci">💡</span><span>${c.txt}</span></div>`;
+  if(c.type==='good')return`<div class="callout cg"><span class="ci">✅</span><span>${c.txt}</span></div>`;
+  if(c.type==='list'){
+    const li=c.items.map(i=>`<li>${i}</li>`).join('');
+    return`<div class="card">${c.h?`<h4>${c.h}</h4>`:''}${c.p?`<p style="margin-bottom:8px">${c.p}</p>`:''}<ul>${li}</ul></div>`;
+  }
+  if(c.type==='twocol'){
+    const li=items=>items.map(i=>`<li>${i}</li>`).join('');
+    return`<div class="two-col"><div class="card"><h4>${c.left.h}</h4><ul>${li(c.left.items)}</ul></div><div class="card hi"><h4 style="color:var(--hi-t)">${c.right.h}</h4><ul>${li(c.right.items)}</ul></div></div>`;
+  }
+  if(c.type==='doavoid'){
+    const li=items=>items.map(i=>`<li>${i}</li>`).join('');
+    return`<div class="two-col"><div class="card ok"><h4>${c.left.h}</h4><ul>${li(c.left.items)}</ul></div><div class="card danger"><h4>${c.right.h}</h4><ul>${li(c.right.items)}</ul></div></div>`;
+  }
+  if(c.type==='flow'){
+    const steps=c.steps.map((s,i)=>{
+      const arrow=i<c.steps.length-1?'<div class="flow-arrow">→</div>':'';
+      return `<div class="flow-step f-${s.color}"><div class="fs-ic">${s.ic}</div><h4>${s.h}</h4><p>${s.b}</p></div>${arrow}`;
+    }).join('');
+    return`<div class="flow">${steps}</div>`;
+  }
+  return'';
+}
+
+// ─── QUIZ (module checks + final exam share this engine) ────────────────
+function shuf(a){
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function startQuiz(id){
+  currentModule=id;
+  quizData=shuf([...QUIZ[id]]).map(q=>{
+    const order=shuf(q.opts.map((_,i)=>i));
+    return {q:q.q, opts:order.map(i=>q.opts[i]), c:order.indexOf(q.c), fb:q.fb};
+  });
+  qi=0; score=0;
+  renderQ(); showScreen('screen-quiz');
+  window.scrollTo(0,0);
+}
+const FINAL_EXAM_FORM_URL='https://forms.gle/mbyMGKXgzcm9FygK6';
+function startExam(){
+  window.open(FINAL_EXAM_FORM_URL,'_blank');
+  setResult('final',100,true);
+  showComplete();
+}
+function renderQ(){
+  const q=quizData[qi];
+  document.getElementById('qfill').style.width=(qi/quizData.length*100)+'%';
+  document.getElementById('qcount').textContent=`Question ${qi+1} of ${quizData.length}`;
+  document.getElementById('qtext').textContent=q.q;
+  const el=document.getElementById('qopts'); el.innerHTML='';
+  q.opts.forEach((o,idx)=>{const b=document.createElement('button');b.className='qopt';b.textContent=o;b.onclick=()=>answerQ(idx);el.appendChild(b);});
+  document.getElementById('qfb').className='qfb';
+  document.getElementById('qnxt').className='qnxt';
+}
+function answerQ(idx){
+  if(document.querySelector('.qopt.answered')) return;
+  const q=quizData[qi]; const ok=idx===q.c;
+  if(ok)score++;
+  document.querySelectorAll('.qopt').forEach((b,i)=>{b.classList.add('answered');if(i===q.c)b.classList.add('correct');else if(i===idx&&!ok)b.classList.add('wrong');});
+  const fb=document.getElementById('qfb');
+  fb.className='qfb show '+(ok?'ok':'bad');
+  fb.innerHTML=(ok?'✓ Correct! ':'✗ Not quite — ')+q.fb;
+  const nx=document.getElementById('qnxt');
+  nx.className='qnxt show';
+  nx.textContent=qi===quizData.length-1?'See Results':'Next →';
+}
+function nextQ(){
+  qi++;
+  if(qi<quizData.length){renderQ();window.scrollTo(0,0);return;}
+  const pct=Math.round(score/quizData.length*100);
+  const passed=pct>=70;
+  setResult(currentModule, pct, passed);
+  showResults(pct, passed);
+}
+
+// ─── RESULTS ──────────────────────────────────────────────────────────────
+function showResults(pct, passed){
+  let acts='';
+  if(currentModule==='final'){
+    if(passed) acts+='<button class="bdark" onclick="showComplete()">🎓 View Certificate</button>';
+    acts+='<button class="bline" onclick="goDashboard()">← Back to Dashboard</button>';
+    acts+='<button class="bline" onclick="startExam()">Retake Final Exam</button>';
+  }else{
+    const m=MODULES.find(x=>x.id===currentModule);
+    if(passed&&m.id<TOTAL) acts+=`<button class="bdark" onclick="openModule(MODULES.find(x=>x.id==${m.id+1}))">Next Module →</button>`;
+    if(passed&&m.id===TOTAL) acts+='<button class="bdark" onclick="goDashboard()">🎓 Go to Final Exam</button>';
+    acts+=`<button class="bline" onclick="openModule(MODULES.find(x=>x.id==${m.id}))">📖 Review Module ${m.id}</button>`;
+    acts+=`<button class="bline" onclick="startQuiz(${m.id})">Retake the Check</button>`;
+  }
+  const label=currentModule==='final'?'exam':'check';
+  const sub=`You answered ${score}/${quizData.length} correctly.`+(passed?` The ${label==='exam'?'training is now certified':'next module is unlocked'}.`:' You need at least 70% to continue.');
+  document.getElementById('rbody').innerHTML=`<div class="remi">${passed?'🎉':'😅'}</div><div class="rtitle">${passed?'You Passed!':'Keep Studying'}</div><div class="rpct ${passed?'pass':'fail'}">${pct}%</div><div class="rsub">${sub}</div>${acts}`;
+  showScreen('screen-results');
+  window.scrollTo(0,0);
+  renderHome();
+}
+
+// ─── CERTIFICATE ──────────────────────────────────────────────────────────
+function showComplete(){
+  const avg=Math.round(MODULES.map(m=>getScore(m.id)).reduce((a,b)=>a+b,0)/TOTAL);
+  document.getElementById('compbody').innerHTML=`<div style="font-size:72px">🎓</div><h1 style="font-family:'Baloo 2',sans-serif;font-size:32px;font-weight:800;letter-spacing:-.5px;margin-top:15px;color:var(--text)">Training Certified!</h1><p style="color:var(--text2);margin-top:9px;font-size:15.5px;line-height:1.65">You've completed all ${TOTAL} modules and passed the final exam — congratulations! Your Attendance Checklist is now unlocked.</p><div class="cert"><div class="clbl2">Certificate of Completion</div><h2>Boost Student Attendance</h2><p>Kodland Tutor Development Department · All ${TOTAL} modules · Final exam: ${getScore('final')}%</p><div class="cmods">${MODULES.map(m=>`<div class="cmod">${m.emoji}</div>`).join('')}</div></div><button class="bdark" style="margin-bottom:10px" onclick="showChecklist()">✅ View Your Checklist →</button><button class="bline" onclick="goDashboard()">← Back to Dashboard</button>`;
+  showScreen('screen-complete');
+  window.scrollTo(0,0);
+}
+
+// ─── CHECKLIST ─────────────────────────────────────────────────────────────
+function showChecklist(){
+  const el=document.getElementById('chkList'); el.innerHTML='';
+  CHECKLIST.forEach((txt,i)=>{
+    const d=document.createElement('div'); d.className='chk-item';
+    d.innerHTML=`<div class="chk-ic">${i+1}</div><div class="chk-txt">${txt}</div>`;
+    el.appendChild(d);
+  });
+  const selfEl=document.getElementById('chkSelf'); selfEl.innerHTML='';
+  SELF_QUESTIONS.forEach(q=>{
+    const d=document.createElement('div'); d.className='chk-self-item';
+    d.innerHTML=`<span class="chk-self-ic">☐</span><span>${q}</span>`;
+    selfEl.appendChild(d);
+  });
+  showScreen('screen-checklist');
+  window.scrollTo(0,0);
+}
+
+// ─── NAVIGATION ──────────────────────────────────────────────────────────
+function exitQuiz(){
+  if(currentModule==='final'){ goDashboard(); return; }
+  const m=MODULES.find(x=>x.id===currentModule); if(m) openModule(m); else goDashboard();
+}
+function goHome(){ showScreen('screen-home'); window.scrollTo(0,0); }
+function goDashboard(){ renderHome(); showScreen('screen-path'); window.scrollTo(0,0); }
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ─── LANGUAGE DROPDOWN ─────────────────────────────────────────────────────
+function toggleLang(e){
+  e.stopPropagation();
+  document.getElementById('langMenu').classList.toggle('show');
+}
+document.addEventListener('click', function(){
+  document.getElementById('langMenu').classList.remove('show');
+});
+
+// ─── DEV MODE (Shift+D ×4, within 2s) ──────────────────────────────────────
+let devKeyBuffer=[];
+document.addEventListener('keydown', function(e){
+  if(e.shiftKey && e.key.toLowerCase()==='d'){
+    const now=Date.now();
+    devKeyBuffer.push(now);
+    devKeyBuffer=devKeyBuffer.filter(t=>now-t<2000);
+    if(devKeyBuffer.length>=4){ toggleDevMode(); devKeyBuffer=[]; }
+  }
+});
+function toggleDevMode(){
+  const isDev=localStorage.getItem('kl-att-devmode')==='1';
+  if(!isDev){
+    localStorage.setItem('kl-att-devmode-backup', localStorage.getItem(PROG_KEY)||'{}');
+    const p={}; MODULES.forEach(m=>{p[m.id]={passed:true,score:100};}); p['final']={passed:true,score:100};
+    saveProgress(p);
+    localStorage.setItem('kl-att-devmode','1');
+    showDevBadge(true);
+  }else{
+    const backup=localStorage.getItem('kl-att-devmode-backup');
+    if(backup) localStorage.setItem(PROG_KEY, backup);
+    localStorage.removeItem('kl-att-devmode');
+    showDevBadge(false);
+  }
+  renderHome();
+}
+function showDevBadge(on){
+  let b=document.getElementById('devBadge');
+  if(on){
+    if(!b){
+      b=document.createElement('div'); b.id='devBadge';
+      b.style.cssText='position:fixed;bottom:16px;right:16px;background:#0B1F45;color:#7BC142;font-family:monospace;font-size:12px;font-weight:700;padding:9px 16px;border-radius:10px;z-index:999;box-shadow:0 6px 20px rgba(0,0,0,.3);letter-spacing:.3px';
+      b.textContent='🛠 DEV MODE — everything unlocked (Shift+D×4 to exit)';
+      document.body.appendChild(b);
+    }
+  }else if(b){ b.remove(); }
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+if(localStorage.getItem('kl-att-devmode')==='1') showDevBadge(true);
+renderHome();
+</script>
+</body>
+</html>
